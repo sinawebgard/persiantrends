@@ -79,5 +79,3 @@ write.csv(trending_over_time, filename.data, fileEncoding = "UTF-8",
           quote = FALSE, row.names = FALSE)
 write.csv(trending_topics, filename.trends, fileEncoding = "UTF-8", 
           quote = FALSE, row.names = FALSE)
-print("Data Successfuly Updated")
-
