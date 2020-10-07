@@ -8,6 +8,7 @@
 # Data Files (input and output)
 
 /Data/*
+!/Data/.gitkeep
 
 # User-specific files
 .Ruserdata
