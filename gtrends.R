@@ -14,22 +14,18 @@ if(file.exists("Data/unwanted.csv"))
 
 # Setting the parameters
 para <- list(geo =  "IR", 
-             time = "now 1-d")
+             time = "now 4-H")
 
 index <- "آهنگ"
         scale <- as.character()
 scale[1] <- "rising"
 scale[2] <- "top"
 
-############################ Break in Execution ########################
-###### Get related queries for the input (kwlist from Data/keywords.csv)
-
 readline("Press any key to get queries related to your keywords")
 
 # getting related queries for all the terms in the "keywords" character vector
         
-        queries.df <- map_dfr(.x = keyterms,
-                          .f = get_queries )
+        queries.df <- map_dfr(.x = keyterms, .f = get_queries )
         
         queries.df %>% filter(related_queries %in% scale) %>% pull(value) %>% 
                 unique() %>% setdiff(unwanted.queries) -> queries
@@ -47,8 +43,7 @@ readline("Press any key to continue -- it may take few minutes")
                                 map_dfr(.f = check_trends ) %>% 
                         rbind(trending_over_time) -> trending_over_time
                         Sys.sleep(3)
-                if(round(i/50) == i/50) readline
-                ("Press any key to continue -- it may take few minutes")
+                if(round(i/50) == i/50) readline("Press any key to continue")
                 }
 trending_over_time <- filter(trending_over_time, !keyword %in% index)
 trending_over_time %>% group_by(keyword) %>% 
