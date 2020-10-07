@@ -14,7 +14,7 @@ if(file.exists("Data/unwanted.csv"))
 
 # Setting the parameters
 para <- list(geo =  "IR", 
-             time = "now 1-H")
+             time = "now 1-d")
 
 index <- "آهنگ"
         scale <- as.character()
@@ -46,10 +46,7 @@ readline("Press any key to continue -- it may take few minutes")
                         c(index, queries[i]) %>% 
                                 map_dfr(.f = check_trends ) %>% 
                         rbind(trending_over_time) -> trending_over_time
-                # slowing down the iteration
-                        Sys.sleep(2)
-                # slowing down the loop
-                        # set the intervals based on the volume of requests
+                        Sys.sleep(3)
                 if(round(i/50) == i/50) readline
                 ("Press any key to continue -- it may take few minutes")
                 }
