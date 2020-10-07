@@ -21,9 +21,13 @@ index <- "آهنگ"
 scale[1] <- "rising"
 scale[2] <- "top"
 
+################# Getting Queries ########################
+### getting related queries for all the terms 
+        ########in the "keywords" character vector
+
+
 readline("Press any key to get queries related to your keywords")
 
-# getting related queries for all the terms in the "keywords" character vector
         
         queries.df <- map_dfr(.x = keyterms, .f = get_queries )
         
@@ -31,17 +35,16 @@ readline("Press any key to get queries related to your keywords")
                 unique() %>% setdiff(unwanted.queries) -> queries
         
         
-##################### Break in Execution################
+##################### Checking Trends ####################
 ############ Get relative popularity for calculated queries
 
 readline("Press any key to continue -- it may take few minutes")
         
         trending_over_time <- vector()
-        
                 for (i in 1:length(queries)) {
-                        c(index, queries[i]) %>% 
+                        trending_over_time <- c(index, queries[i]) %>% 
                                 map_dfr(.f = check_trends ) %>% 
-                        rbind(trending_over_time) -> trending_over_time
+                        rbind(trending_over_time)
                         Sys.sleep(2)
                 if(round(i/50) == i/50) readline("Press any key to continue")
                 }
@@ -51,7 +54,7 @@ trending_over_time %>% group_by(keyword) %>%
                                 arrange(desc(average)) -> trending_topics
 
 
-################## Break in Execution ########################
+################## Exporting Output Data ########################
 ############## save the data in time-coded csv files and sub-directories
 
 readline("Press any key to create the output files")
