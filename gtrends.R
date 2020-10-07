@@ -42,7 +42,7 @@ readline("Press any key to continue -- it may take few minutes")
                         c(index, queries[i]) %>% 
                                 map_dfr(.f = check_trends ) %>% 
                         rbind(trending_over_time) -> trending_over_time
-                        Sys.sleep(3)
+                        Sys.sleep(2)
                 if(round(i/50) == i/50) readline("Press any key to continue")
                 }
 trending_over_time <- filter(trending_over_time, !keyword %in% index)
