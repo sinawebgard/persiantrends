@@ -2,6 +2,7 @@ library(gtrendsR)
 library(dplyr)
 library(purrr)
 library(stringr)
+library(e1071)
 source("FUN.R")
 
 if(exists("keywords")){
@@ -14,7 +15,7 @@ if(file.exists("Data/unwanted.csv"))
 
 # Setting the parameters
 para <- list(geo =  "IR", 
-             time = "now 4-H")
+             time = "now 1-H")
 
 index <- "آهنگ"
         scale <- as.character()
@@ -50,8 +51,10 @@ readline("Press any key to continue -- it may take few minutes")
                 }
 trending_over_time <- filter(trending_over_time, !keyword %in% index)
 trending_over_time %>% group_by(keyword) %>% 
-                        summarise(average = mean(hits)) %>%
-                                arrange(desc(average)) -> trending_topics
+                        summarise(average = mean(hits, na.rm = TRUE), 
+                                variance = sd(hits, na.rm = TRUE)^2,
+                                skewness = skewness(hits, na.rm = TRUE)) -> 
+                                                                trending_topics
 
 
 ################## Exporting Output Data ########################
