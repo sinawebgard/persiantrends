@@ -15,12 +15,12 @@ if(file.exists("Data/unwanted.csv"))
 
 # Setting the parameters
 para <- list(geo =  "IR", 
-             time = "now 1-H")
+             time = "now 4-H")
 
 index <- "آهنگ"
         scale <- as.character()
 scale[1] <- "rising"
-scale[2] <- "top"
+#scale[2] <- "top"
 
 ################# Getting Queries ########################
 ### getting related queries for all the terms 
