@@ -15,12 +15,13 @@ if(file.exists("Data/unwanted.csv"))
 
 # Setting the parameters
 para <- list(geo =  "IR", 
-             time = "now 4-H")
+             time = "now 1-H",
+             tz = -60)
 
 index <- "آهنگ"
         scale <- as.character()
 scale[1] <- "rising"
-#scale[2] <- "top"
+scale[2] <- "top"
 
 ################# Getting Queries ########################
 ### getting related queries for all the terms 
@@ -44,7 +45,7 @@ readline("Press any key to continue -- it may take few minutes")
         trending_over_time <- vector()
                 for (i in 1:length(queries)) {
                         trending_over_time <- c(index, queries[i]) %>% 
-                                map_dfr(.f = check_trends ) %>% 
+                                check_trends() %>% 
                         rbind(trending_over_time)
                         Sys.sleep(2)
                 if(round(i/50) == i/50) readline("Press any key to continue")
@@ -52,6 +53,7 @@ readline("Press any key to continue -- it may take few minutes")
 trending_over_time <- filter(trending_over_time, !keyword %in% index)
 trending_over_time %>% group_by(keyword) %>% 
                         summarise(average = mean(hits, na.rm = TRUE), 
+                                median = median(hits, na.rm = TRUE),
                                 variance = sd(hits, na.rm = TRUE)^2,
                                 skewness = skewness(hits, na.rm = TRUE)) -> 
                                                                 trending_topics
