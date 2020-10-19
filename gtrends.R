@@ -31,7 +31,7 @@ queries <- split(queries, 1: ceiling(length(queries) / group_length))
         trending_over_time <- vector()
                 for (i in 1:length(queries)) {
                 ####### slowing down the iteration 
-                        sleep_time <- ifelse(i %% 50 == 0, 
+                        sleep_time <- ifelse(i %% 25 == 0, 
                                              sample(10:15, 1), 
                                              sample(0:2, 1))
                         Sys.sleep(sleep_time)

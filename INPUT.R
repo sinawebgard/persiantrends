@@ -1,4 +1,4 @@
-############ Defining Input variables
+############ Defining Input variables#####################
 
 if (exists("keywords")) {
   keyterms <- keywords
@@ -6,11 +6,10 @@ if (exists("keywords")) {
   keyterms <-
     readLines("/home/sina/Projects/persiantrends/Data/keywords.csv")
 }
-if (!exists("filter_terms"))
-  filter_terms <- TRUE
+if (!exists("filter_terms")) filter_terms <- TRUE
 if (file.exists("/home/sina/Projects/persiantrends/Data/unwanted.csv") &
     filter_terms)
-  unwanted.queries <- readLines("Data/unwanted.csv") else
+  unwanted.queries <- readLines("/home/sina/Projects/persiantrends/Data/unwanted.csv") else
   unwanted.queries <- vector()
 
 ########################### Setting the parameters#########
