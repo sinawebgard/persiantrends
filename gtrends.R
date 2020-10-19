@@ -3,25 +3,8 @@ library(dplyr)
 library(purrr)
 library(stringr)
 library(e1071)
-source("FUN.R")
-
-if(exists("keywords")){
-        keyterms <- keywords
-}       else{
-        keyterms <- readLines("Data/keywords.csv")
-}
-if(file.exists("Data/unwanted.csv")) 
-        unwanted.queries <- readLines("Data/unwanted.csv")
-
-########################### Setting the parameters#########
-para <- list(geo =  "IR", 
-             time = "now 4-H",
-             tz = -60)
-
-index <- "سایت"         # up to 4 keywords as  benchmarks for trends
-scale <- as.character()         #selecting 'rising' and/or 'top' trends
-        scale[1] <- "rising"
-        scale[2] <- "top"
+source("/home/sina/Projects/persiantrends/FUN.R")
+source("/home/sina/Projects/persiantrends/INPUT.R")
 
 ################# Getting Queries ########################
 ### getting related queries for all the terms 
@@ -47,14 +30,14 @@ queries <- split(queries, 1: ceiling(length(queries) / group_length))
         
         trending_over_time <- vector()
                 for (i in 1:length(queries)) {
+                ####### slowing down the iteration 
+                        sleep_time <- ifelse(i %% 50 == 0, 
+                                             sample(10:15, 1), 
+                                             sample(0:2, 1))
+                        Sys.sleep(sleep_time)
                         trending_over_time <- c(index, queries[[i]]) %>% 
                                 check_trends() %>% 
                         rbind(trending_over_time)
-####### slowing down the iteration 
-        sleep_time <- ifelse(i %% 50 == 0, 
-                             sample(10:15, 1), 
-                             sample(0:2, 1))
-        Sys.sleep(sleep_time)
 }
 trending_over_time <- filter(trending_over_time, !keyword %in% index)
 trending_over_time %>% group_by(keyword) %>% 
@@ -76,12 +59,13 @@ gtrends.info <- str_split(para$time, " ") %>% unlist %>%
         paste(collapse = "_") %>% paste(para$geo, sep = "_")
 time.info <- format(Sys.time(), "%d-%b-%Y_%H-%M")
 
-filename.queries <- paste0("Data/", Sys.Date(), "/", time.info, "_", 
-                           gtrends.info, "_queries.csv")
-filename.data <- paste0("Data/", Sys.Date(), "/", time.info, "_", 
-                        gtrends.info, "_data.csv")
-filename.trends <- paste0("Data/", Sys.Date(), "/", time.info, "_", 
-                          gtrends.info, "_trends.csv")
+file_path <- "/home/sina/Projects/persiantrends/Data/"
+filename.queries <- paste0(file_path, Sys.Date(), "/", time.info, 
+                           "_", gtrends.info, "_queries.csv")
+filename.data <- paste0(file_path, Sys.Date(), "/", time.info, 
+                        "_", gtrends.info, "_data.csv")
+filename.trends <- paste0(file_path, Sys.Date(), "/", time.info, 
+                          "_", gtrends.info, "_trends.csv")
 
 
 write.csv(queries.df, filename.queries, fileEncoding = "UTF-8", 
