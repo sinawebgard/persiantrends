@@ -10,9 +10,6 @@ source("/home/sina/Projects/persiantrends/INPUT.R")
 ### getting related queries for all the terms 
         ########in the "keywords" character vector
 
-
-readline("Press any key to get queries related to your keywords")
-
 keyterms <- split(keyterms, 1: ceiling(length(keyterms) / 5))        
         queries.df <- map_dfr(.x = keyterms, .f = get_queries )
         
