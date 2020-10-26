@@ -17,7 +17,7 @@ check_trends <- function (keywords, parameters = para) {
                           time = para$time,
                           tz = para$tz,
                           onlyInterest = TRUE)$interest_over_time %>%
-                within(trends, {
+                within( {
                         hits[hits == "<1"] <- sample(0:1, 1)
                         hits <- as.integer(hits)
         })
