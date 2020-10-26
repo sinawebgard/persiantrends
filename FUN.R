@@ -4,7 +4,7 @@ get_queries <- function (keywords, parameters = para) {
         trends <- gtrends(keywords, 
                           geo = para$geo,
                           time = para$time,
-                          tz= para$tz) %>% .$related_queries
+                          tz= para$tz)$related_queries
 }
 
 
