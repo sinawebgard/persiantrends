@@ -3,14 +3,14 @@ library(dplyr)
 library(purrr)
 library(stringr)
 library(e1071)
-source("/home/sina/Projects/persiantrends/FUN.R")
-source("/home/sina/Projects/persiantrends/INPUT.R")
+source("FUN.R")
+source("INPUT.R")
 
 ################# Getting Queries ########################
 ### getting related queries for all the terms 
         ########in the "keywords" character vector
 
-keyterms <- split(keyterms, 1: ceiling(length(keyterms) / 5))        
+keyterms <- split(keyterms, 1: ceiling(length(keyterms) / 4))        
         queries.df <- map_dfr(.x = keyterms, .f = get_queries )
         
         queries.df %>% filter(related_queries %in% scale) %>% .$value %>% 
@@ -22,14 +22,14 @@ keyterms <- split(keyterms, 1: ceiling(length(keyterms) / 5))
 
 readline("Press any key to continue -- it may take few minutes")
 
-group_length <- 5- length(index)
+group_length <-  - length(index)
 queries <- split(queries, 1: ceiling(length(queries) / group_length))
         
         trending_over_time <- vector()
                 for (i in 1:length(queries)) {
                 ####### slowing down the iteration 
                         sleep_time <- ifelse(i %% 25 == 0, 
-                                             sample(10:15, 1), 
+                                             sample(11:15, 1), 
                                              sample(0:2, 1))
                         Sys.sleep(sleep_time)
                         trending_over_time <- c(index, queries[[i]]) %>% 
@@ -56,12 +56,11 @@ gtrends.info <- str_split(para$time, " ") %>% unlist %>%
         paste(collapse = "_") %>% paste(para$geo, sep = "_")
 time.info <- format(Sys.time(), "%d-%b-%Y_%H-%M")
 
-file_path <- "/home/sina/Projects/persiantrends/Data/"
-filename.queries <- paste0(file_path, Sys.Date(), "/", time.info, 
+filename.queries <- paste0("Data/", Sys.Date(), "/", time.info, 
                            "_", gtrends.info, "_queries.csv")
-filename.data <- paste0(file_path, Sys.Date(), "/", time.info, 
+filename.data <- paste0("Data/", Sys.Date(), "/", time.info, 
                         "_", gtrends.info, "_data.csv")
-filename.trends <- paste0(file_path, Sys.Date(), "/", time.info, 
+filename.trends <- paste0("Data/", Sys.Date(), "/", time.info, 
                           "_", gtrends.info, "_trends.csv")
 
 
