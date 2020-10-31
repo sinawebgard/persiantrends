@@ -18,7 +18,7 @@ if (file.exists("Data/unwanted.csv") &
 
 ########################### Setting the parameters#########
 para <- list(geo =  "IR",
-             time = "now 4-H",
+             time = "now 1-H",
              tz = 0)
 
 index <-  c("یا")         # up to 4 keywords as  benchmarks for trends

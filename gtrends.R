@@ -7,14 +7,11 @@ source("FUN.R")
 source("INPUT.R")
 
 ################# Getting Queries ########################
-### getting related queries for all the terms 
-        ########in the "keywords" character vector
+### getting related queries for all the keyterms
 ##### keyterms can be split to groups of maximum five keywords.
-        ##### Below keyterms have been split to smaler groups- that's because
-        ##### I use search operators to combine keywords, and larger groups are
-        ##### more likely to return status code: 404
+        ##### Note: larger groups are more likely to return status code: 404
 
-keyterms <- split(keyterms, 1: ceiling(length(keyterms) /3 ))        
+keyterms <- split(keyterms, 1: ceiling(length(keyterms) /5 ))        
         queries.df <- map_dfr(.x = keyterms, .f = get_queries )
         
         queries.df %>% filter(related_queries %in% scale) %>% .$value %>% 
@@ -26,7 +23,7 @@ keyterms <- split(keyterms, 1: ceiling(length(keyterms) /3 ))
 
 readline("Press any key to continue -- it may take few minutes")
 
-group_length <- 4 - length(index)
+group_length <- 5 - length(index)
 queries <- split(queries, 1: ceiling(length(queries) / group_length))
         
         trending_over_time <- vector()
