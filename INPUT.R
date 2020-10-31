@@ -6,6 +6,11 @@ if (exists("keywords")) {
   keyterms <-
     readLines("Data/keywords.csv")
 }
+########## add search operators to keywords and filter unwanted queries#######
+
+keyterms <- paste(keyterms,
+                  " -آهنگ -دانلود -سریال")
+
 if (!exists("filter_terms")) filter_terms <- TRUE
 if (file.exists("Data/unwanted.csv") &
     filter_terms) unwanted.queries <- readLines("Data/unwanted.csv") else
@@ -13,7 +18,7 @@ if (file.exists("Data/unwanted.csv") &
 
 ########################### Setting the parameters#########
 para <- list(geo =  "IR",
-             time = "now 1-H",
+             time = "now 4-H",
              tz = 0)
 
 index <-  c("یا")         # up to 4 keywords as  benchmarks for trends

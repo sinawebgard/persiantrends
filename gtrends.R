@@ -10,15 +10,15 @@ source("INPUT.R")
 ### getting related queries for all the terms 
         ########in the "keywords" character vector
 ##### keyterms can be split to groups of maximum five keywords.
-        ##### Below keyterms have been split to groups of four- that's because
+        ##### Below keyterms have been split to smaler groups- that's because
         ##### I use search operators to combine keywords, and larger groups are
         ##### more likely to return status code: 404
 
-keyterms <- split(keyterms, 1: ceiling(length(keyterms) / 4))        
+keyterms <- split(keyterms, 1: ceiling(length(keyterms) /3 ))        
         queries.df <- map_dfr(.x = keyterms, .f = get_queries )
         
         queries.df %>% filter(related_queries %in% scale) %>% .$value %>% 
-                unique() %>% setdiff(unwanted.queries) -> queries
+                unique() %>% setdiff(y = unwanted.queries) -> queries
         
         
 ##################### Checking Trends ####################
@@ -26,7 +26,7 @@ keyterms <- split(keyterms, 1: ceiling(length(keyterms) / 4))
 
 readline("Press any key to continue -- it may take few minutes")
 
-group_length <- 5 - length(index)
+group_length <- 4 - length(index)
 queries <- split(queries, 1: ceiling(length(queries) / group_length))
         
         trending_over_time <- vector()
@@ -34,7 +34,7 @@ queries <- split(queries, 1: ceiling(length(queries) / group_length))
                 ####### slowing down the iteration 
                         sleep_time <- ifelse(i %% 25 == 0, 
                                              sample(11:20, 1), 
-                                             sample(1:3, 1))
+                                             sample(0:2, 1))
                         Sys.sleep(sleep_time)
                         trending_over_time <- c(index, queries[[i]]) %>% 
                                 check_trends() %>% 
@@ -45,8 +45,8 @@ trending_over_time %>% group_by(keyword) %>%
                         summarise(average = mean(hits, na.rm = TRUE), 
                                 median = median(hits, na.rm = TRUE),
                                 variance = sd(hits, na.rm = TRUE)^2,
-                                skewness = skewness(hits, na.rm = TRUE)) -> 
-                                                                trending_topics
+                                skewness = skewness(hits, na.rm = TRUE),
+                                max = max(hits, na.rm = TRUE))-> trending_topics
 
 
 ################## Exporting Output Data ########################

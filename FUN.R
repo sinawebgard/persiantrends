@@ -1,6 +1,5 @@
 
 get_queries <- function (keywords, parameters = para) { 
-        
         trends <- gtrends(keywords, 
                           geo = para$geo,
                           time = para$time,
