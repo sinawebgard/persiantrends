@@ -11,7 +11,7 @@ source("INPUT.R")
 ##### keyterms can be split to groups of maximum five keywords.
         ##### Note: larger groups are more likely to return status code: 404
 
-keyterms <- split(keyterms, 1: ceiling(length(keyterms) /5 ))        
+keyterms <- split(keyterms, 1: ceiling(length(keyterms) /3 ))        
         queries.df <- map_dfr(.x = keyterms, .f = get_queries )
         
         queries.df %>% filter(related_queries %in% scale) %>% .$value %>% 
@@ -22,8 +22,10 @@ keyterms <- split(keyterms, 1: ceiling(length(keyterms) /5 ))
 ############ Get relative popularity for calculated queries
 
 readline("Press any key to continue -- it may take few minutes")
-
-group_length <- 5 - length(index)
+################# queries can be split to groups of maximum four plus the index term
+        ###### larger groups are more likely to fail to retun status code = 200
+        
+group_length <- 4 - length(index)
 queries <- split(queries, 1: ceiling(length(queries) / group_length))
         
         trending_over_time <- vector()
