@@ -23,7 +23,7 @@ keyterms <- split(keyterms, 1: ceiling(length(keyterms) /3 ))
 
 readline("Press any key to continue -- it may take few minutes")
 ################# queries can be split to groups of maximum four plus the index term
-        ###### larger groups are more likely to fail to retun status code = 200
+        ###### larger groups are more likely to fail to return status code = 200
         
 group_length <- 4 - length(index)
 queries <- split(queries, 1: ceiling(length(queries) / group_length))
