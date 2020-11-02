@@ -4,18 +4,31 @@ library(purrr)
 library(stringr)
 library(e1071)
 source("FUN.R")
-source("INPUT.R")
+
+######## Reading Input files #########################
+
+reset_para <- readline("Reset parameters to default values? (y/n) ")
+        if(reset_para == "y" | reset_para == "Y") set_parameters()
+
+scale <- vector(mode = "character")
+if(para$top) scale <- c(scale, "top")
+if(para$rising) scale <- c(scale, "rising")
+
+if(!para$overwrite | !exists("keyterms")) keyterms <-
+        readLines("Data/keywords.csv")
+if(!para$overwrite & file.exists("Data/unwanted.csv")) unwanted_queries <- 
+        readLines("Data/unwanted.csv")
+                if(!exists("unwanted_queries")) unwanted.queries <- vector()
 
 ################# Getting Queries ########################
 ### getting related queries for all the keyterms
 ##### keyterms can be split to groups of maximum five keywords.
         ##### Note: larger groups are more likely to return status code: 404
 
-keyterms <- split(keyterms, 1: ceiling(length(keyterms) /3 ))        
-        queries.df <- map_dfr(.x = keyterms, .f = get_queries )
-        
+keyterms <- split(keyterms, 1: ceiling(length(keyterms) /3 ))    
+queries.df <- map_dfr(.x = keyterms, .f = get_queries )
         queries.df %>% filter(related_queries %in% scale) %>% .$value %>% 
-                unique() %>% setdiff(y = unwanted.queries) -> queries
+                unique() %>% setdiff(y = unwanted_queries) -> queries
         
         
 ##################### Checking Trends ####################
@@ -25,9 +38,8 @@ readline("Press any key to continue -- it may take few minutes")
 ################# queries can be split to groups of maximum four plus the index term
         ###### larger groups are more likely to fail to return status code = 200
         
-group_length <- 4 - length(index)
+group_length <- 5 - length(para$index)
 queries <- split(queries, 1: ceiling(length(queries) / group_length))
-        
         trending_over_time <- vector()
                 for (i in 1:length(queries)) {
                 ####### slowing down the iteration 
@@ -35,17 +47,22 @@ queries <- split(queries, 1: ceiling(length(queries) / group_length))
                                              sample(11:20, 1), 
                                              sample(0:2, 1))
                         Sys.sleep(sleep_time)
-                        trending_over_time <- c(index, queries[[i]]) %>% 
-                                check_trends() %>% 
-                        rbind(trending_over_time)
+                        trending_over_time <- c(para$index, queries[[i]]) %>% 
+                                                check_trends() %>% 
+                                 rbind(trending_over_time)
 }
-trending_over_time <- filter(trending_over_time, !keyword %in% index)
-trending_over_time %>% group_by(keyword) %>% 
+trending_over_time <- filter(trending_over_time, !keyword %in% para$index) %>%
+        within( {
+                hits[hits == "<1"] <- sample(0:1, 1)
+                hits <- as.integer(hits)
+        }) %>%
+                group_by(keyword) %>% 
                         summarise(average = mean(hits, na.rm = TRUE), 
                                 median = median(hits, na.rm = TRUE),
                                 variance = sd(hits, na.rm = TRUE)^2,
                                 skewness = skewness(hits, na.rm = TRUE),
-                                max = max(hits, na.rm = TRUE))-> trending_topics
+                                max = max(hits, na.rm = TRUE))-> 
+                                                        trending_topics
 
 
 ################## Exporting Output Data ########################

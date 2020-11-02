@@ -1,3 +1,22 @@
+################# Setting the parameters for the study 
+
+set_parameters <- function(geo = "IR",
+                           time = "now 4-H",
+                           tz = 0,
+                           index = "یا",
+                           top = TRUE,
+                           rising = TRUE,
+                           overwrite = FALSE){
+  para <<- list(geo = geo,
+                time = time,
+                tz = tz,
+                index = index,
+                top = top, 
+                rising = rising,
+                overwrite = overwrite)
+}
+
+################ setting arguments for gtrends function
 
 get_queries <- function (keywords, parameters = para) { 
         trends <- gtrends(keywords, 
@@ -15,9 +34,6 @@ check_trends <- function (keywords, parameters = para) {
                           geo = para$geo,
                           time = para$time,
                           tz = para$tz,
-                          onlyInterest = TRUE)$interest_over_time %>%
-                within( {
-                        hits[hits == "<1"] <- sample(0:1, 1)
-                        hits <- as.integer(hits)
-        })
+                          onlyInterest = TRUE)$interest_over_time
 }
+
