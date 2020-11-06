@@ -25,26 +25,27 @@ if(para$overwrite & file.exists("Data/unwanted.csv")) unwanted_queries <-
 ### getting related queries for all the keyterms
 ##### keywords can be split to groups of maximum five keywords.
         ##### Note: larger groups are more likely to return status code: 404
-
+suppressWarnings(
         if(length(keywords) > 5) 
                 {
                 kwlist <- split(keywords, 1: ceiling(length(keywords) /3 )) 
         } else kwlist <- keywords
+)
 queries.df <- map_dfr(.x = kwlist, .f = get_queries )
         queries.df %>% filter(related_queries %in% scale) %>% .$value %>% 
                 unique() %>% setdiff(y = unwanted_queries) -> queries
         
 #################### Removing custom unwanted queries ###########
         
-        view_queries <- readline("Press y/Y t view queries")
+        view_queries <- readline("Press y/Y t view queries ")
         if(view_queries == "y" | view_queries == "Y") View(queries)
         
-        max_length <- readline("maximum length for queries ")
+        max_length <- as.integer(readline("maximum length for queries "))
         word_length <- sapply(str_split(queries, " "), length)
         queries <- queries[word_length <= max_length]
         
         repeat{
-                omit <- readline("Enter the term you want to remove?")
+                omit <- readline("Enter the term you want to remove? ")
                 if(omit == "") break
                 drop_query <- which(str_detect(queries, omit))
                         if(any(drop_query)) queries <- queries[-drop_query]
@@ -59,7 +60,9 @@ readline("Press any key to continue -- it may take few minutes")
         ###### larger groups are more likely to fail to return status code = 200
         
 group_length <- 5 - length(para$index)
-queries <- split(queries, 1: ceiling(length(queries) / group_length))
+suppressWarnings(
+        queries <- split(queries, 1: ceiling(length(queries) / group_length))
+)
         trending_over_time <- vector()
                 for (i in 1:length(queries)) {
                 ####### slowing down the iteration 
