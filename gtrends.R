@@ -8,27 +8,47 @@ source("FUN.R")
 ######## Reading Input files #########################
 
 reset_para <- readline("Reset parameters to default values? (y/n) ")
-        if(reset_para == "y" | reset_para == "Y") set_parameters()
+        
+if(reset_para == "y" | reset_para == "Y" | !exists("para")) set_parameters()
 
 scale <- vector(mode = "character")
 if(para$top) scale <- c(scale, "top")
 if(para$rising) scale <- c(scale, "rising")
 
-if(!para$overwrite | !exists("keyterms")) keyterms <-
+if(para$overwrite | !exists("keywords")) keywords <-
         readLines("Data/keywords.csv")
-if(!para$overwrite & file.exists("Data/unwanted.csv")) unwanted_queries <- 
+if(para$overwrite & file.exists("Data/unwanted.csv")) unwanted_queries <- 
         readLines("Data/unwanted.csv")
                 if(!exists("unwanted_queries")) unwanted.queries <- vector()
 
 ################# Getting Queries ########################
 ### getting related queries for all the keyterms
-##### keyterms can be split to groups of maximum five keywords.
+##### keywords can be split to groups of maximum five keywords.
         ##### Note: larger groups are more likely to return status code: 404
 
-keyterms <- split(keyterms, 1: ceiling(length(keyterms) /3 ))    
-queries.df <- map_dfr(.x = keyterms, .f = get_queries )
+        if(length(keywords) > 5) 
+                {
+                kwlist <- split(keywords, 1: ceiling(length(keywords) /3 )) 
+        } else kwlist <- keywords
+queries.df <- map_dfr(.x = kwlist, .f = get_queries )
         queries.df %>% filter(related_queries %in% scale) %>% .$value %>% 
                 unique() %>% setdiff(y = unwanted_queries) -> queries
+        
+#################### Removing custom unwanted queries ###########
+        
+        view_queries <- readline("Press y/Y t view queries")
+        if(view_queries == "y" | view_queries == "Y") View(queries)
+        
+        max_length <- readline("maximum length for queries ")
+        word_length <- sapply(str_split(queries, " "), length)
+        queries <- queries[word_length <= max_length]
+        
+        repeat{
+                omit <- readline("Enter the term you want to remove?")
+                if(omit == "") break
+                drop_query <- which(str_detect(queries, omit))
+                        if(any(drop_query)) queries <- queries[-drop_query]
+        }
         
         
 ##################### Checking Trends ####################
