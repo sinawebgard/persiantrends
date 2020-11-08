@@ -1,9 +1,12 @@
 library(gtrendsR) 
 library(dplyr)
-library(purrr)
+library(foreach)
+library(doParallel)
 library(stringr)
 library(e1071)
 source("FUN.R")
+
+registerDoParallel(cores = 4)
 
 ######## Reading Input files #########################
 
@@ -31,7 +34,10 @@ suppressWarnings(
                 kwlist <- split(keywords, 1: ceiling(length(keywords) /3 )) 
         } else kwlist <- keywords
 )
-queries.df <- map_dfr(.x = kwlist, .f = get_queries )
+        queries.df <- foreach(i = 1:length(kwlist), .combine = rbind) %dopar% {
+                        get_queries(kwlist[[i]])
+}
+        
         queries.df %>% filter(related_queries %in% scale) %>% .$value %>% 
                 unique() %>% setdiff(y = unwanted_queries) -> queries
         
@@ -63,29 +69,26 @@ group_length <- 5 - length(para$index)
 suppressWarnings(
         queries <- split(queries, 1: ceiling(length(queries) / group_length))
 )
-        trending_over_time <- vector()
-                for (i in 1:length(queries)) {
-                ####### slowing down the iteration 
-                        sleep_time <- ifelse(i %% 25 == 0, 
-                                             sample(11:20, 1), 
-                                             sample(0:2, 1))
-                        Sys.sleep(sleep_time)
-                        trending_over_time <- c(para$index, queries[[i]]) %>% 
-                                                check_trends() %>% 
-                                 rbind(trending_over_time)
-}
-trending_over_time <- filter(trending_over_time, !keyword %in% para$index) %>%
+
+        trending_over_time <- foreach(i = 1:length(queries), 
+                                      .combine = rbind) %dopar% {
+                sleep_time <- ifelse(i %% 25 == 0, 
+                                        sample(11:20, 1), 
+                                        sample(0:2, 1))
+                        Sys.sleep(sleep_time) ## slowing down the iteration 
+                c(para$index, queries[[i]]) %>% check_trends() 
+                        } %>% filter(trending_over_time, 
+                                     !keyword %in% para$index) %>%
         within( {
                 hits[hits == "<1"] <- sample(0:1, 1)
                 hits <- as.integer(hits)
-        }) %>%
-                group_by(keyword) %>% 
-                        summarise(average = mean(hits, na.rm = TRUE), 
-                                median = median(hits, na.rm = TRUE),
-                                variance = sd(hits, na.rm = TRUE)^2,
-                                skewness = skewness(hits, na.rm = TRUE),
-                                max = max(hits, na.rm = TRUE))-> 
-                                                        trending_topics
+        })
+        trending_topics <- trending_over_time %>% group_by(keyword) %>% 
+                                summarise(average = mean(hits, na.rm = TRUE), 
+                                        median = median(hits, na.rm = TRUE),
+                                        variance = sd(hits, na.rm = TRUE)^2,
+                                        skewness = skewness(hits, na.rm = TRUE),
+                                        max = max(hits, na.rm = TRUE))
 
 
 ################## Exporting Output Data ########################
