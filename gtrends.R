@@ -70,7 +70,7 @@ suppressWarnings(
                         trending_over_time <- c(para$index, queries[[i]]) %>% 
                                                 check_trends() %>% 
                                  rbind(trending_over_time)
-        } %>% filter(trending_over_time, !keyword %in% para$index) %>%
+        } %>% filter(!keyword %in% para$index) %>%
                             within( {
                                    hits[hits == "<1"] <- sample(0:1, 1)
                                    hits <- as.integer(hits)
