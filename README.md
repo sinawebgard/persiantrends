@@ -1,19 +1,30 @@
 # Persian Trends via Google Trends
 
-### A project to check the related queries of a set of keywords and sort the queries based on their relative popularity
+### A project to get the related queries of a set of keywords and check the Google hits of the queries based on their relative popularity
 
+## Latest version
+
+The current version is making use of parallel computing in R to process a large list of keywords and queries. The previous version is available as v1.1
 
 ## Codes and Scripts
 
-**FUN.R** contains the functions for downloading Google Trends data. The functions are wrappers for gtrends() from gtrendsR package.
+**FUN.R** contains the functions for downloading Google Trends data, as wrappers for gtrends() function in the package 'gtrendsR', and setting default or custom parameters for the study.
 
 * get_queries() take your key search term and get their related queries in the specified time-frame and geographical parameters.
 
 * check_trends() gets a character vector of search terms as its input and check the terms against eachother, returning the interest_over_time as a data frame and ensuring that the 'hits' variable in the data frame will always be an integer vector.
 
+* set_parameters() sets parameters for the study:
+     * geo (character) country code or sub-code. See 'countries' in gtrendsR package. Default value is "IR".
+     * time (character) the time argument for gtrends wrapper functions. Look at ?gtrends for format. Default value is "now 1-4" to look at past four hours.
+     * tz (integer) time-zone. A number specifying the minutes the returned dates whould be offset to UTC. Default value is 0.
+     * index (character) a vector of up to four benchmark keywords to be compared with queries in order to calculate their relative hits. Default should be keyword with a relatively stable and high search popularity.
+     * top (logical) whether top related queries should be included. Default value is TRUE
+     rising (logical) whether 'rising' related queries should be included. Default value is TRUE.
+     * overwrite (logical) if 'keywords' and/or 'unwated_queries' already exist in the Global Environment, whether these vectors should be overwritten by the values of the input files. Default value is TRUE.
+     * cores (integer) number of cores for parallel computing. The default value is 4.
 
-
-**gtrends.R** the main script, using the functions defined in 'FUN.R' to take a series of key search terms, getting a list of their related queries ('top' queries and/or 'rising), removing irrelavant queries before checking each entry against a fixed index to assess its relative popularity within the specified time-frame and geographical parameters. The output of the script will automatically be stored in time-coded csv files in the Data folder.
+**gtrends.R** the main script, using the functions defined in 'FUN.R' to take a series of key search terms, getting a list of their related queries ('top' queries and/or 'rising), removing irrelevant and unwanted queries before checking each entry against a fixed benchmark (index) to assess its relative popularity within the specified time-frame and geographical parameters. The output of the script will automatically be stored in time-coded csv files in the Data folder.
 
 ## Data
 
@@ -31,7 +42,15 @@ All filenames contain the follwoing info:
 
 * keyword: (character) the search query
 
-* average: (integer) the mean of the related search volume of the query
+* average: (numeric) the mean of the related search volume of the query
+
+* median: (numeric)
+
+* variance (numeric)
+
+* skewness (numeric)
+
+* max (integer)
 
 **data.csv** storing 'trending_over_time' data frame. The data frame has 7 variables:
 
@@ -61,26 +80,6 @@ All filenames contain the follwoing info:
 
 ### Input Files and variables
 
-**keywwords.csv** contains a series of search terms.
+**keywwords.csv** contains a series of search terms. Will be used by the main script if $overwrite argument in set_parameters is TRUE (default) or if the object 'keywords' does not exist in the Global Environment.
 
-**unwanted.csv** contains a series of phrases which are redundant or irrelevant to the study, including generic terms, terms with relatively fixed popularity in search, and terms which are irrelevant to the aim of the study but may come up as queries related to your key search terms.
-
-**Other Input Variables**
-
-**keywords** : (character) a vector of search key terms that can be assigned in the interactive console. If exists will override the content of the 'keywords.csv'
-
-**para**: (list) geographical and coronological parameters to be used as arguments for gtrends queries.
-
-+ $geo (character) geographical parameter, i.e. "IR" or "US" or "" (blank) for Worldwide
-
-+ $time (character) coronological parameter, i.e. "now 1-d", "now 1-H", or "today 7-d"
-
-**index**: (character) a vector of 1 to 4 search terms to check the relative search of our input (keyterms) against them. Should be generic terms with relatively high but stable search volume.
-
-**scale**: (character) a vector defining with related_queries to be kept. Can take either or both of these values: 'rising' and 'top'
-
-
-
-
-
-
+**unwanted.csv** contains a series of phrases which are redundant or irrelevant to the study, including generic terms, terms with relatively fixed popularity in search, and terms which are irrelevant to the aim of the study but may come up as queries related to your key search terms. Wil be used by the main script if $overwrite argument in set_parameters is TRUE (default). 

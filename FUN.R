@@ -2,12 +2,12 @@
 
 set_parameters <- function(geo = "IR",
                            time = "now 4-H",
-                           tz = 0,
+                           tz = 0L,
                            index = "یا",
                            top = TRUE,
                            rising = TRUE,
                            overwrite = TRUE,
-                           cores =4 ){
+                           cores =4L ){
   para <<- list(geo = geo,
                 time = time,
                 tz = tz,
