@@ -58,12 +58,10 @@ suppressWarnings(
         }
         
         
-##################### Checking Trends ####################
-############ Get relative popularity for calculated queries
+##################### Checking relative hits of queries ####################
 
-readline("Press any key to continue -- it may take few minutes")
-################# queries can be split to groups of maximum four plus the index term
-        ###### larger groups are more likely to fail to return status code = 200
+### queries can be split to groups of maximum four plus the index term
+        ### larger groups are more likely to fail to return status code = 200
         
 group_length <- 5 - length(para$index)
 suppressWarnings(
@@ -77,12 +75,11 @@ suppressWarnings(
                                         sample(0:2, 1))
                         Sys.sleep(sleep_time) ## slowing down the iteration 
                 c(para$index, queries[[i]]) %>% check_trends() 
-                        } %>% filter(trending_over_time, 
-                                     !keyword %in% para$index) %>%
-        within( {
-                hits[hits == "<1"] <- sample(0:1, 1)
-                hits <- as.integer(hits)
-        })
+                        } %>% filter(!keyword %in% para$index) %>%
+                        within( {
+                                hits[hits == "<1"] <- sample(0:1, 1)
+                                hits <- as.integer(hits)
+                        })
         trending_topics <- trending_over_time %>% group_by(keyword) %>% 
                                 summarise(average = mean(hits, na.rm = TRUE), 
                                         median = median(hits, na.rm = TRUE),
