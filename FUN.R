@@ -6,14 +6,16 @@ set_parameters <- function(geo = "IR",
                            index = "یا",
                            top = TRUE,
                            rising = TRUE,
-                           overwrite = TRUE){
+                           overwrite = TRUE,
+                           cores =4 ){
   para <<- list(geo = geo,
                 time = time,
                 tz = tz,
                 index = index,
                 top = top, 
                 rising = rising,
-                overwrite = overwrite)
+                overwrite = overwrite,
+                cores = cores)
 }
 
 ################ setting arguments for gtrends function

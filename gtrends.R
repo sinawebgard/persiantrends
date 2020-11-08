@@ -6,7 +6,7 @@ library(stringr)
 library(e1071)
 source("FUN.R")
 
-registerDoParallel(cores = 4)
+registerDoParallel(cores = para$cores)
 
 ######## Reading Input files #########################
 
