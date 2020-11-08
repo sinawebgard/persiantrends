@@ -5,6 +5,10 @@
 # Session Data files
 .RData
 
+# Rproj files
+
+project.Rproj
+
 # Data Files (input and output)
 
 /Data/*
