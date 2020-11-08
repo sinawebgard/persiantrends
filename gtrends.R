@@ -52,12 +52,9 @@ queries.df <- map_dfr(.x = kwlist, .f = get_queries )
         }
         
         
-##################### Checking Trends ####################
-############ Get relative popularity for calculated queries
-
-readline("Press any key to continue -- it may take few minutes")
-################# queries can be split to groups of maximum four plus the index term
-        ###### larger groups are more likely to fail to return status code = 200
+##################### Checking hits for queries ####################
+## queries can be split to groups of maximum four plus the index term
+        ## larger groups are more likely to fail to return status code = 200
         
 group_length <- 5 - length(para$index)
 suppressWarnings(
@@ -73,19 +70,17 @@ suppressWarnings(
                         trending_over_time <- c(para$index, queries[[i]]) %>% 
                                                 check_trends() %>% 
                                  rbind(trending_over_time)
-}
-trending_over_time <- filter(trending_over_time, !keyword %in% para$index) %>%
-        within( {
-                hits[hits == "<1"] <- sample(0:1, 1)
-                hits <- as.integer(hits)
-        }) %>%
-                group_by(keyword) %>% 
-                        summarise(average = mean(hits, na.rm = TRUE), 
-                                median = median(hits, na.rm = TRUE),
-                                variance = sd(hits, na.rm = TRUE)^2,
-                                skewness = skewness(hits, na.rm = TRUE),
-                                max = max(hits, na.rm = TRUE))-> 
-                                                        trending_topics
+        } %>% filter(trending_over_time, !keyword %in% para$index) %>%
+                            within( {
+                                   hits[hits == "<1"] <- sample(0:1, 1)
+                                   hits <- as.integer(hits)
+                            })
+        trending_topics <- trending_over_time %>% group_by(keyword) %>% 
+                                summarise(average = mean(hits, na.rm = TRUE), 
+                                        median = median(hits, na.rm = TRUE),
+                                        variance = sd(hits, na.rm = TRUE)^2,
+                                        skewness = skewness(hits, na.rm = TRUE),
+                                        max = max(hits, na.rm = TRUE))
 
 
 ################## Exporting Output Data ########################
