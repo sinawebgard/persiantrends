@@ -36,6 +36,10 @@ check_trends <- function (keywords, parameters = para) {
                           geo = para$geo,
                           time = para$time,
                           tz = para$tz,
-                          onlyInterest = TRUE)$interest_over_time
+                          onlyInterest = TRUE)$interest_over_time %>%
+          within( {
+            hits[hits == "<1"] <- sample(0:1, 1)
+            hits <- as.integer(hits)
+          })
 }
 

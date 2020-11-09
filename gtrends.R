@@ -75,11 +75,7 @@ suppressWarnings(
                                         sample(0:2, 1))
                         Sys.sleep(sleep_time) ## slowing down the iteration 
                 c(para$index, queries[[i]]) %>% check_trends() 
-                        } %>% filter(!keyword %in% para$index) %>%
-                        within( {
-                                hits[hits == "<1"] <- sample(0:1, 1)
-                                hits <- as.integer(hits)
-                        })
+                        } %>% filter(!keyword %in% para$index)
         trending_topics <- trending_over_time %>% group_by(keyword) %>% 
                                 summarise(average = mean(hits, na.rm = TRUE), 
                                         median = median(hits, na.rm = TRUE),
@@ -91,6 +87,12 @@ suppressWarnings(
 ################## Exporting Output Data ########################
 ############## save the data in time-coded csv files and sub-directories
 
+        
+        rm(list = setdiff(ls(), 
+                          c("trending_over_time", "trending_topics", 
+                            "queries.df", "keywords", "unwanted_queries", 
+                            "set_parameters", "para")))
+        
 readline("Press any key to create the output files")
 
 if(!dir.exists(paste0("Data/", Sys.Date()))) dir.create(paste0("Data/", Sys.Date()))
