@@ -66,11 +66,8 @@ suppressWarnings(
         trending_over_time <- foreach(i = 1:length(queries), 
                                       .combine = rbind) %dopar% {
                 c(para$index, queries[[i]]) %>% check_trends() 
-                        } %>% filter(!keyword %in% para$index) %>%
-                        within( {
-                                hits[hits == "<1"] <- sample(0:1, 1)
-                                hits <- as.integer(hits)
-                        })
+                        } %>% filter(!keyword %in% para$index)
+                        
         trending_topics <- trending_over_time %>% group_by(keyword) %>% 
                                 summarise(average = mean(hits, na.rm = TRUE), 
                                         median = median(hits, na.rm = TRUE),
