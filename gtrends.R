@@ -1,3 +1,5 @@
+## Version 2.2 
+
 library(gtrendsR) 
 library(dplyr)
 library(foreach)
@@ -28,11 +30,17 @@ if(para$overwrite & file.exists("Data/unwanted.csv")) unwanted_queries <-
 
 ################# Getting Queries ########################
 ### getting related queries for all the keyterms
-
-        queries.df <- foreach(i = 1:length(keywords), .combine = rbind) %dopar% {
-                        get_queries(keywords[[i]])
-}
-        
+        try <- 0
+        queries.df <- data.frame()
+        while (length(keywords) > 0 & try != 3) {
+                        res <- foreach(i = 1:length(keywords), 
+                                      .combine = rbind) %dopar% {
+                        try_queries(keywords[[i]])
+                                      }
+        queries.df <- rbind(queries.df, res)
+        keywords <- setdiff(keywords, res$keyword)
+        try <- try + 1
+        }
         queries.df %>% filter(related_queries %in% scale) %>% .$value %>% 
                 unique() %>% setdiff(y = unwanted_queries) -> queries
         
@@ -57,21 +65,27 @@ if(para$overwrite & file.exists("Data/unwanted.csv")) unwanted_queries <-
 
 ### queries can be split to groups of maximum four plus the index term
         ### larger groups are more likely to fail to return status code = 200
-        
-group_length <- 5 - length(para$index)
-suppressWarnings(
-        queries <- split(queries, 1: ceiling(length(queries) / group_length))
-)
-
-        trending_over_time <- foreach(i = 1:length(queries), 
+        try <- 0
+        trending_over_time <- data.frame()
+        while(length(queries) > 0 & try != 3) {
+        group_length <- 5 - length(para$index)
+        suppressWarnings(
+                queries_list <- split(queries, 
+                                1: ceiling(length(queries) / group_length))
+        )     
+                res <- foreach(i = 1:length(queries_list), 
                                       .combine = rbind) %dopar% {
-                        sleep_time <- ifelse(i %% 25 == 0, 
-                                           sample(11:20, 1), 
-                                           sample(0:2, 1))
-                        Sys.sleep(sleep_time) ## slowing down the iteration 
-                c(para$index, queries[[i]]) %>% check_trends() 
-                        } %>% filter(!keyword %in% para$index)
-                        
+                                           sleep_time <- ifelse(i %% 25 == 0, 
+                                                        sample(11:20, 1), 
+                                                        sample(0:2, 1))
+                                        Sys.sleep(sleep_time)
+                        c(para$index, queries_list[[i]]) %>% 
+                                                        try_trends() 
+                                      } %>% filter(!keyword %in% para$index) 
+        trending_over_time <- rbind(trending_over_time, res)
+        queries <- setdiff(queries, res$keyword)
+        try <- try + 1
+}
         trending_topics <- trending_over_time %>% group_by(keyword) %>% 
                                 summarise(average = mean(hits, na.rm = TRUE), 
                                         median = median(hits, na.rm = TRUE),
@@ -85,8 +99,8 @@ suppressWarnings(
 
 rm(list = setdiff(ls(), 
                   c("trending_over_time", "trending_topics", 
-                    "queries.df", "keywords", "unwanted_queries", 
-                    "set_parameters", "para")))
+                    "queries.df", "keywords", "unwanted_queries", "queries",
+                                                "set_parameters", "para")))
         
 readline("Press any key to create the output files")
 

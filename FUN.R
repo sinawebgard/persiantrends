@@ -20,26 +20,27 @@ set_parameters <- function(geo = "IR",
 
 ################ setting arguments for gtrends function
 
-get_queries <- function (keywords, parameters = para) { 
-        trends <- gtrends(keywords, 
-                          geo = para$geo,
-                          time = para$time,
-                          tz= para$tz)$related_queries
+
+try_queries <- function (keywords, parameters = para) { 
+  queries <- tryCatch(gtrends(keywords, 
+                              geo = para$geo,
+                              time = para$time,
+                              tz= para$tz)$related_queries , 
+                      error = function(e) e)
+  if (inherits(queries, "error")) Sys.sleep(10) else return(queries)
 }
 
 
 
-check_trends <- function (keywords, parameters = para) { 
-
-        
-        trends <- gtrends(keywords, 
-                          geo = para$geo,
-                          time = para$time,
-                          tz = para$tz,
-                          onlyInterest = TRUE)$interest_over_time %>%
-          within( {
-            hits[hits == "<1"] <- sample(0:1, 1)
-            hits <- as.integer(hits)
-          })
+try_trends <- function (keywords, parameters = para) { 
+  trends <- tryCatch(gtrends(keywords, 
+                             geo = para$geo,
+                             time = para$time,
+                             tz = para$tz,
+                             onlyInterest = TRUE)$interest_over_time %>%
+                       within( {
+                         hits[hits == "<1"] <- sample(0:1, 1)
+                         hits <- as.integer(hits)
+                       }), error = function(e) e)
+  if (inherits(trends, "error")) Sys.sleep(10) else return(trends)
 }
-
