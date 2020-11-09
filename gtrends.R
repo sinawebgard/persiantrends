@@ -83,6 +83,10 @@ suppressWarnings(
 ################## Exporting Output Data ########################
 ############## save the data in time-coded csv files and sub-directories
 
+rm(list = setdiff(ls(), 
+                  c("trending_over_time", "trending_topics", 
+                    "queries.df", "keywords", "unwanted_queries", 
+                    "set_parameters", "para")))
         
 readline("Press any key to create the output files")
 
