@@ -1,3 +1,5 @@
+## Version 2.2
+
 ################# Setting the parameters for the study 
 
 set_parameters <- function(geo = "IR",
@@ -27,7 +29,7 @@ try_queries <- function (keywords, parameters = para) {
                               time = para$time,
                               tz= para$tz)$related_queries , 
                       error = function(e) e)
-  if (inherits(queries, "error")) Sys.sleep(10) else return(queries)
+  if (inherits(queries, "error")) Sys.sleep(30) else return(queries)
 }
 
 
@@ -42,5 +44,5 @@ try_trends <- function (keywords, parameters = para) {
                          hits[hits == "<1"] <- sample(0:1, 1)
                          hits <- as.integer(hits)
                        }), error = function(e) e)
-  if (inherits(trends, "error")) Sys.sleep(10) else return(trends)
+  if (inherits(trends, "error")) Sys.sleep(30) else return(trends)
 }

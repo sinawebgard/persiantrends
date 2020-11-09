@@ -32,7 +32,7 @@ if(para$overwrite & file.exists("Data/unwanted.csv")) unwanted_queries <-
 ### getting related queries for all the keyterms
         try <- 0
         queries.df <- data.frame()
-        while (length(keywords) > 0 & try != 3) {
+        while (length(keywords) > 0 & try != 4) {
                         res <- foreach(i = 1:length(keywords), 
                                       .combine = rbind) %dopar% {
                         try_queries(keywords[[i]])
@@ -40,6 +40,7 @@ if(para$overwrite & file.exists("Data/unwanted.csv")) unwanted_queries <-
         queries.df <- rbind(queries.df, res)
         keywords <- setdiff(keywords, res$keyword)
         try <- try + 1
+        Sys.sleep(30)
         }
         queries.df %>% filter(related_queries %in% scale) %>% .$value %>% 
                 unique() %>% setdiff(y = unwanted_queries) -> queries
@@ -67,7 +68,7 @@ if(para$overwrite & file.exists("Data/unwanted.csv")) unwanted_queries <-
         ### larger groups are more likely to fail to return status code = 200
         try <- 0
         trending_over_time <- data.frame()
-        while(length(queries) > 0 & try != 3) {
+        while(length(queries) > 0 & try != 4) {
         group_length <- 5 - length(para$index)
         suppressWarnings(
                 queries_list <- split(queries, 
@@ -85,6 +86,7 @@ if(para$overwrite & file.exists("Data/unwanted.csv")) unwanted_queries <-
         trending_over_time <- rbind(trending_over_time, res)
         queries <- setdiff(queries, res$keyword)
         try <- try + 1
+        Sys.sleep(30)
 }
         trending_topics <- trending_over_time %>% group_by(keyword) %>% 
                                 summarise(average = mean(hits, na.rm = TRUE), 
@@ -97,11 +99,6 @@ if(para$overwrite & file.exists("Data/unwanted.csv")) unwanted_queries <-
 ################## Exporting Output Data ########################
 ############## save the data in time-coded csv files and sub-directories
 
-rm(list = setdiff(ls(), 
-                  c("trending_over_time", "trending_topics", 
-                    "queries.df", "keywords", "unwanted_queries", "queries",
-                                                "set_parameters", "para")))
-        
 readline("Press any key to create the output files")
 
 if(!dir.exists(paste0("Data/", Sys.Date()))) dir.create(paste0("Data/", Sys.Date()))
@@ -124,3 +121,8 @@ write.csv(trending_over_time, filename.data, fileEncoding = "UTF-8",
           quote = FALSE, row.names = FALSE)
 write.csv(trending_topics, filename.trends, fileEncoding = "UTF-8", 
           quote = FALSE, row.names = FALSE)
+
+rm(list = setdiff(ls(), 
+                  c("trending_over_time", "trending_topics", 
+                    "queries.df", "keywords", "unwanted_queries", "queries",
+                    "set_parameters", "para")))
