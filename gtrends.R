@@ -18,24 +18,19 @@ scale <- vector(mode = "character")
 if(para$top) scale <- c(scale, "top")
 if(para$rising) scale <- c(scale, "rising")
 
-if(para$overwrite | !exists("keywords")) keywords <-
+if(para$overwrite | !exists("keywords")) keywords <- 
         readLines("Data/keywords.csv")
 if(para$overwrite & file.exists("Data/unwanted.csv")) unwanted_queries <- 
         readLines("Data/unwanted.csv")
                 if(!exists("unwanted_queries")) unwanted.queries <- vector()
 
+        keywords <- paste(keywords, "-آهنگ -سریال -دانلود")
+
 ################# Getting Queries ########################
 ### getting related queries for all the keyterms
-##### keywords can be split to groups of maximum five keywords.
-        ##### Note: larger groups are more likely to return status code: 404
-suppressWarnings(
-        if(length(keywords) > 5) 
-                {
-                kwlist <- split(keywords, 1: ceiling(length(keywords) /3 )) 
-        } else kwlist <- keywords
-)
-        queries.df <- foreach(i = 1:length(kwlist), .combine = rbind) %dopar% {
-                        get_queries(kwlist[[i]])
+
+        queries.df <- foreach(i = 1:length(keywords), .combine = rbind) %dopar% {
+                        get_queries(keywords[[i]])
 }
         
         queries.df %>% filter(related_queries %in% scale) %>% .$value %>% 
@@ -70,10 +65,6 @@ suppressWarnings(
 
         trending_over_time <- foreach(i = 1:length(queries), 
                                       .combine = rbind) %dopar% {
-                sleep_time <- ifelse(i %% 25 == 0, 
-                                        sample(11:20, 1), 
-                                        sample(0:2, 1))
-                        Sys.sleep(sleep_time) ## slowing down the iteration 
                 c(para$index, queries[[i]]) %>% check_trends() 
                         } %>% filter(!keyword %in% para$index) %>%
                         within( {
@@ -91,6 +82,7 @@ suppressWarnings(
 ################## Exporting Output Data ########################
 ############## save the data in time-coded csv files and sub-directories
 
+        
 readline("Press any key to create the output files")
 
 if(!dir.exists(paste0("Data/", Sys.Date()))) dir.create(paste0("Data/", Sys.Date()))
