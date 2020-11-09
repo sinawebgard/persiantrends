@@ -65,6 +65,10 @@ suppressWarnings(
 
         trending_over_time <- foreach(i = 1:length(queries), 
                                       .combine = rbind) %dopar% {
+                        sleep_time <- ifelse(i %% 25 == 0, 
+                                           sample(11:20, 1), 
+                                           sample(0:2, 1))
+                        Sys.sleep(sleep_time) ## slowing down the iteration 
                 c(para$index, queries[[i]]) %>% check_trends() 
                         } %>% filter(!keyword %in% para$index)
                         
