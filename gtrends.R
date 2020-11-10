@@ -32,15 +32,15 @@ if(para$overwrite & file.exists("Data/unwanted.csv")) unwanted_queries <-
 ### getting related queries for all the keyterms
         try <- 0
         queries.df <- data.frame()
-        while (length(keywords) > 0 & try != 4) {
+        while (length(keywords) > 0 & try != 3) {
                         res <- foreach(i = 1:length(keywords), 
                                       .combine = rbind) %dopar% {
                         try_queries(keywords[[i]])
                                       }
         queries.df <- rbind(queries.df, res)
-        keywords <- setdiff(keywords, res$keyword)
+        keywords <- setdiff(keywords, 
+                            gsub("\\+", " \\+ ", res$keyword))
         try <- try + 1
-        Sys.sleep(30)
         }
         queries.df %>% filter(related_queries %in% scale) %>% .$value %>% 
                 unique() %>% setdiff(y = unwanted_queries) -> queries
@@ -68,7 +68,7 @@ if(para$overwrite & file.exists("Data/unwanted.csv")) unwanted_queries <-
         ### larger groups are more likely to fail to return status code = 200
         try <- 0
         trending_over_time <- data.frame()
-        while(length(queries) > 0 & try != 4) {
+        while(length(queries) > 0 & try != 3) {
         group_length <- 5 - length(para$index)
         suppressWarnings(
                 queries_list <- split(queries, 
@@ -77,8 +77,8 @@ if(para$overwrite & file.exists("Data/unwanted.csv")) unwanted_queries <-
                 res <- foreach(i = 1:length(queries_list), 
                                       .combine = rbind) %dopar% {
                                            sleep_time <- ifelse(i %% 25 == 0, 
-                                                        sample(11:20, 1), 
-                                                        sample(0:2, 1))
+                                                        sample(11:15, 1), 
+                                                        sample(0:1, 1))
                                         Sys.sleep(sleep_time)
                         c(para$index, queries_list[[i]]) %>% 
                                                         try_trends() 
@@ -86,7 +86,6 @@ if(para$overwrite & file.exists("Data/unwanted.csv")) unwanted_queries <-
         trending_over_time <- rbind(trending_over_time, res)
         queries <- setdiff(queries, res$keyword)
         try <- try + 1
-        Sys.sleep(30)
 }
         trending_topics <- trending_over_time %>% group_by(keyword) %>% 
                                 summarise(average = mean(hits, na.rm = TRUE), 
