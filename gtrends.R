@@ -8,7 +8,6 @@ library(stringr)
 library(e1071)
 source("FUN.R")
 
-registerDoParallel(cores = para$cores)
 
 ######## Reading Input files #########################
 
@@ -27,9 +26,12 @@ if(para$overwrite & file.exists("Data/unwanted.csv")) unwanted_queries <-
                 if(!exists("unwanted_queries")) unwanted.queries <- vector()
 
         keywords <- paste(keywords, "-آهنگ -سریال -دانلود")
+if(is.null(para$cores)) cores <- detectCores() else cores <- para$cores
+registerDoParallel(cores)
 
 ################# Getting Queries ########################
 ### getting related queries for all the keyterms
+
         try <- 0
         queries.df <- data.frame()
         while (length(keywords) > 0 & try != 3) {
@@ -86,7 +88,8 @@ if(para$overwrite & file.exists("Data/unwanted.csv")) unwanted_queries <-
         trending_over_time <- rbind(trending_over_time, res)
         queries <- setdiff(queries, res$keyword)
         try <- try + 1
-}
+        }
+registerDoSEQ()
         trending_topics <- trending_over_time %>% group_by(keyword) %>% 
                                 summarise(average = mean(hits, na.rm = TRUE), 
                                         median = median(hits, na.rm = TRUE),
