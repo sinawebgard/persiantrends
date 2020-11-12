@@ -4,7 +4,18 @@
 
 ## Latest version
 
-The current version is making use of parallel computing in R to process a large list of keywords and queries. The previous version is available as v1.1
+*V2.2*
+
+* Error handling with TryCatch: re-running through iterations if some of the queries return error codes.
+
+*V2.1*
+
+* Using parallel computing in R to process large lists of keywords and queries. The serial version is available as v1.1
+
+*V1.1*
+
+* Splitting keywords, as well as returned queries, into lists of up to five key terms so they can be sent to Google API at the same time
+
 
 ## Codes and Scripts
 
