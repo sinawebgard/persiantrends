@@ -26,7 +26,7 @@ if(para$overwrite & file.exists("Data/unwanted.csv")) unwanted_queries <-
                 if(!exists("unwanted_queries")) unwanted.queries <- vector()
 
         keywords <- paste(keywords, "-آهنگ -سریال -دانلود")
-if(is.null(para$cores)) cores <- detectCores() else cores <- para$cores
+if(is.null(para$cores)) cores <- detectCores() - 1 else cores <- para$cores
 registerDoParallel(cores)
 
 ################# Getting Queries ########################

@@ -21,9 +21,9 @@
 
 **FUN.R** contains the functions for downloading Google Trends data, as wrappers for gtrends() function in the package 'gtrendsR', and setting default or custom parameters for the study.
 
-* get_queries() take your key search term and get their related queries in the specified time-frame and geographical parameters.
+* try_queries() take your key search term and get their related queries for the specified time-frame and geographical parameters. Returens NULL and pause for 5 seconds if encounters an error.
 
-* check_trends() gets a character vector of search terms as its input and check the terms against eachother, returning the interest_over_time as a data frame and ensuring that the 'hits' variable in the data frame will always be an integer vector.
+* try_trends() gets a character vector of search terms as its input and check the terms against eachother, returning the interest_over_time as a data frame and ensuring that the 'hits' variable in the data frame will always be an integer vector. Returns NULL and pause for 5 seconds if encounters an error.
 
 * set_parameters() sets parameters for the study:
      * geo (character) country code or sub-code. See 'countries' in gtrendsR package. Default value is "IR".
