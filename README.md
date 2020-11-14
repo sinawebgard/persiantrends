@@ -33,7 +33,7 @@
      * top (logical) whether top related queries should be included. Default value is TRUE
      rising (logical) whether 'rising' related queries should be included. Default value is TRUE.
      * overwrite (logical) if 'keywords' and/or 'unwated_queries' already exist in the Global Environment, whether these vectors should be overwritten by the values of the input files. Default value is TRUE.
-     * cores (integer) number of cores for parallel computing. The default value is 4.
+     * cores (integer) number of cores for parallel computing; if NULL (default value) detects the number of available cores.
 
 **gtrends.R** the main script, using the functions defined in 'FUN.R' to take a series of key search terms, getting a list of their related queries ('top' queries and/or 'rising), removing irrelevant and unwanted queries before checking each entry against a fixed benchmark (index) to assess its relative popularity within the specified time-frame and geographical parameters. The output of the script will automatically be stored in time-coded csv files in the Data folder.
 
